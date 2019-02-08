@@ -25,9 +25,11 @@ function artifactPath(artifact: Artifact): string {
   return path.join(groupPath(artifact), filename(artifact));
 }
 
-async function latestSnapShotVersion(artifact: Artifact, basepath: string) {
+async function latestSnapShotVersion(artifact: Artifact, basepath: string, username: string, password: string) {
   const metadataUrl = basepath + groupPath(artifact) + '/maven-metadata.xml';
-  const response = await fetch(metadataUrl);
+  let headers = new Headers();
+  headers.set('Authorization', 'Basic ' + Buffer.from(username + ":" + password).toString("base64"));
+  const response = await fetch(metadataUrl, {headers: headers});
   if (response.status !== 200) {
     throw new Error(
       `Unable to fetch ${metadataUrl}. Status ${response.status}`
@@ -42,11 +44,13 @@ async function latestSnapShotVersion(artifact: Artifact, basepath: string) {
 
 export default (async function artifactUrl(
   artifact: Artifact,
-  basePath?: string
+  basePath?: string,
+  userName?: string,
+  password?: string
 ) {
   const prefix = basePath || 'https://repo1.maven.org/maven2/';
   if (artifact.isSnapShot) {
-    const snapShotVersion = await latestSnapShotVersion(artifact, prefix);
+    const snapShotVersion = await latestSnapShotVersion(artifact, prefix, userName, password);
     return prefix + artifactPath({ ...artifact, snapShotVersion });
   } else {
     return prefix + artifactPath(artifact);
