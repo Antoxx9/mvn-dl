@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/laat/mvn-dl#readme",
   "dependencies": {
+    "btoa": "^1.2.1",
     "mvn-artifact-filename": "^4.0.0",
     "node-fetch": "^2.2.0",
     "xml2js": "^0.4.17"

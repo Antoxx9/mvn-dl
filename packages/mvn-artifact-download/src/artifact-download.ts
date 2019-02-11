@@ -4,6 +4,7 @@ import parseName from 'mvn-artifact-name-parser';
 import getFilename from 'mvn-artifact-filename';
 import artifactUrl from 'mvn-artifact-url';
 import fetch from 'node-fetch';
+import { Headers } from 'node-fetch';
 
 function pipeToFile(body: NodeJS.ReadableStream, destFile: string) {
   return new Promise((resolve, reject) => {
@@ -31,17 +32,18 @@ export default (async function download(
   destination = destination || process.cwd();
   const artifact = parseName(artifactName);
 
-  const url = await artifactUrl(artifact, repository);
+  const url = await artifactUrl(artifact, repository, username, password);
 
   const destFile = path.join(
     destination || process.cwd(),
     filename || getFilename(artifact)
   );
   const response = await fetch(url, {
-    headers: {
+    headers: new Headers({
       Authorization:
         'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
-    },
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }),
   });
   if (response.status !== 200) {
     throw new Error(`Unable to fetch ${url}. Status ${response.status}`);

@@ -1,6 +1,6 @@
 import path from 'path';
 import filename from 'mvn-artifact-filename';
-import fetch from 'node-fetch';
+import fetch, { Headers } from 'node-fetch';
 import parseXmlString from './parseXmlString';
 
 export interface Artifact {
@@ -33,10 +33,11 @@ async function latestSnapShotVersion(
 ) {
   const metadataUrl = basepath + groupPath(artifact) + '/maven-metadata.xml';
   const response = await fetch(metadataUrl, {
-    headers: {
+    headers: new Headers({
       Authorization:
         'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
-    },
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }),
   });
   if (response.status !== 200) {
     throw new Error(
