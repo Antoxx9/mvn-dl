@@ -32,14 +32,17 @@ export default (async function download(
   const artifact = parseName(artifactName);
 
   const url = await artifactUrl(artifact, repository);
-  let headers = new Headers();
-  headers.set('Authorization', 'Basic ' + Buffer.from(username + ":" + password).toString("base64"));
 
   const destFile = path.join(
     destination || process.cwd(),
     filename || getFilename(artifact)
   );
-  const response = await fetch(url, {headers: headers});
+  const response = await fetch(url, {
+    headers: {
+      Authorization:
+        'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
+    },
+  });
   if (response.status !== 200) {
     throw new Error(`Unable to fetch ${url}. Status ${response.status}`);
   }
